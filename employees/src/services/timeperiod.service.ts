@@ -44,8 +44,6 @@ export class TimePeriodService implements ITimePeriodService {
 
     // NULL (which means current date)
 
-    // Supporting only YYYY-MM-DD and NULL for now
-
     dateStr = dateStr.trim();
 
     if (

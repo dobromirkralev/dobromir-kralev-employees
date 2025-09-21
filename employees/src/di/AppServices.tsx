@@ -1,13 +1,16 @@
 import React, { createContext, useContext } from "react";
 import type { ITimePeriodService } from "../services/types/timeperiod";
-import { TimePeriodService } from "../services/timeperiod.service";
+import type { IModelsBuilder } from "../services/types/modelsbuider";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IAppServices {
-  timePeriodService: ITimePeriodService;
+  timePeriodService?: ITimePeriodService;
+  modelsBuilderService?: IModelsBuilder;
 }
 
 const defaultServices: IAppServices = {
-  timePeriodService: new TimePeriodService(),
+  timePeriodService: undefined,
+  modelsBuilderService: undefined,
 };
 
 const AppServicesContext = createContext<IAppServices>(defaultServices);
