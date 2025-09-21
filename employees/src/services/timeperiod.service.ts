@@ -1,6 +1,36 @@
+import type { TimePeriod, TimePeriodDelta } from "../models/timeperiod";
 import type { ITimePeriodService } from "./types/timeperiod";
 
 export class TimePeriodService implements ITimePeriodService {
+  createTimePeriod(startDate: Date, endDate: Date): TimePeriod {
+    return {
+      start: startDate,
+      end: endDate,
+      numberOfDays: this.calculateNumberOfDays(startDate, endDate),
+    };
+  }
+
+  createDeltaPeriod(
+    perdiod1: TimePeriod,
+    period2: TimePeriod
+  ): TimePeriodDelta {
+    const latestStart =
+      perdiod1.start > period2.start ? perdiod1.start : period2.start;
+    const earliestEnd = perdiod1.end < period2.end ? perdiod1.end : period2.end;
+    if (latestStart > earliestEnd) {
+      return {
+        startTime: latestStart,
+        endTime: earliestEnd,
+        delta: 0, // No overlap
+      };
+    }
+    return {
+      startTime: latestStart,
+      endTime: earliestEnd,
+      delta: this.calculateNumberOfDays(latestStart, earliestEnd),
+    };
+  }
+
   calculateNumberOfDays(start: Date, end: Date): number {
     const millisecondsPerDay = 1000 * 60 * 60 * 24;
     const startUtc = Date.UTC(

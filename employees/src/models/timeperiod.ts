@@ -5,7 +5,7 @@ export interface TimePeriod {
 }
 
 export interface TimePeriodDelta {
-  startTimePeriod: TimePeriod;
-  endTimePeriod: TimePeriod;
+  startTime: Date;
+  endTime: Date;
   delta: number;
 }

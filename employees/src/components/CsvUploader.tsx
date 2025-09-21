@@ -8,7 +8,6 @@ export const CsvUploader: React.FC = () => {
 
   useEffect(() => {
     if (data.length > 0) {
-      console.log("Parsed CSV Data:", data);
       modelsBuilderService?.buildModels(data);
     }
   }, [data]);
