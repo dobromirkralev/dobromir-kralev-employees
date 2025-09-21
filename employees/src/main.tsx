@@ -1,10 +1,18 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.tsx";
+import { AppServicesProvider } from "./di/AppServices.tsx";
+import { TimePeriodService } from "./services/timeperiod.service.ts";
 
-createRoot(document.getElementById('root')!).render(
+const services = {
+  timePeriodService: new TimePeriodService(),
+};
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <AppServicesProvider services={services}>
+      <App />
+    </AppServicesProvider>
+  </StrictMode>
+);
