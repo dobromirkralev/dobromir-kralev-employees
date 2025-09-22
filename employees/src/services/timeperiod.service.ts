@@ -80,8 +80,6 @@ export class TimePeriodService implements ITimePeriodService {
     // MM/DD/YYYY
     // DD/MM/YYYY
 
-    // Month DD, YYYY
-
     // NULL (which means current date)
 
     dateStr = dateStr.trim();
@@ -109,16 +107,6 @@ export class TimePeriodService implements ITimePeriodService {
     }
 
     dt = DateTime.fromFormat(dateStr, "dd/MM/yyyy", { zone: "utc" });
-    if (dt.isValid) {
-      return dt.toJSDate();
-    }
-
-    dt = DateTime.fromFormat(dateStr, "MMMM dd, yyyy", { zone: "utc" });
-    if (dt.isValid) {
-      return dt.toJSDate();
-    }
-
-    dt = DateTime.fromFormat(dateStr, "MMM dd, yyyy", { zone: "utc" });
     if (dt.isValid) {
       return dt.toJSDate();
     }

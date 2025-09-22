@@ -19,6 +19,12 @@ export class ModelsBuilderService {
   }
 
   buildModels(data: string[][]): void {
+    // resets state
+    this.employeeList = [];
+    this.projects = new Map();
+    this.employeeProjectPeriods = [];
+    this.aggregatedPairs = new Map();
+
     data.forEach((row) => {
       const [employeeIdStr, projectIdStr, startDateStr, endDateStr] = row;
       const employeeId = employeeIdStr;
@@ -46,10 +52,10 @@ export class ModelsBuilderService {
       }
     });
 
-    console.log(this.projects);
+    // console.log(this.projects);
     this.buildPairsPerProject();
     this.aggregatePairsAccrossProjects();
-    console.log(this.findTopPair());
+    // console.log(this.findTopPair());
   }
 
   buildPairsPerProject(): void {
@@ -83,7 +89,7 @@ export class ModelsBuilderService {
       employeeProjectPeriods,
       ([id, overlapPeriod]) => ({ id, overlapPeriod })
     );
-    console.log(this.employeeProjectPeriods);
+    // console.log(this.employeeProjectPeriods);
   }
 
   aggregatePairsAccrossProjects(): Map<
@@ -115,7 +121,7 @@ export class ModelsBuilderService {
       }
     }
 
-    console.log(this.aggregatedPairs);
+    // console.log(this.aggregatedPairs);
     return this.aggregatedPairs;
   }
 
@@ -134,5 +140,37 @@ export class ModelsBuilderService {
       }
     }
     return topPair;
+  }
+
+  listTopPairsProjects(topPair: {
+    empA: string;
+    empB: string;
+    totalTime: number;
+    projects: string[];
+  }): {
+    empA: string;
+    empB: string;
+    projectId: string;
+    daysTogther: number;
+  }[] {
+    return this.employeeProjectPeriods
+      .filter((record) => {
+        const [empA, empB, projId] = record.id.split(":");
+        console.log({ empA, empB, projId });
+        return (
+          ((empA === topPair.empA && empB === topPair.empB) ||
+            (empA === topPair.empB && empB === topPair.empA)) &&
+          topPair.projects.indexOf(projId) !== -1
+        );
+      })
+      .map((record) => {
+        const [empA, empB, projectId] = record.id.split(":");
+        return {
+          empA,
+          empB,
+          projectId,
+          daysTogther: record.overlapPeriod.delta,
+        };
+      });
   }
 }
