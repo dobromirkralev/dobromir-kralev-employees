@@ -9,6 +9,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableHead,
   TableRow,
 } from "@mui/material";
 
@@ -108,6 +109,14 @@ export const CsvUploader: React.FC = () => {
             </p>
             <TableContainer component={Paper}>
               <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Employee A</TableCell>
+                    <TableCell>Employee B</TableCell>
+                    <TableCell>Project ID</TableCell>
+                    <TableCell>Days Together</TableCell>
+                  </TableRow>
+                </TableHead>
                 <TableBody>
                   {commonProjects.map((commonProject, rowIndex) => (
                     <TableRow key={rowIndex}>
