@@ -1,12 +1,16 @@
 import "./App.css";
+import { Container, Typography } from "@mui/material";
 import { CsvUploader } from "./components/CsvUploader";
 
 function App() {
   return (
     <>
-      <div className='file-upload-container'>
+      <Container maxWidth='md' sx={{ mt: 4 }}>
+        <Typography variant='h4' component='h1' gutterBottom>
+          Employee Pair Work Time Tracker
+        </Typography>
         <CsvUploader />
-      </div>
+      </Container>
     </>
   );
 }
