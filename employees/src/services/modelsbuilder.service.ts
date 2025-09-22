@@ -8,6 +8,10 @@ export class ModelsBuilderService {
 
   projects: Map<string, Employee[]> = new Map();
   employeeProjectPeriods: EmployeesProjectPeriod[] = [];
+  aggregatedPairs: Map<
+    string,
+    { empA: string; empB: string; totalTime: number; projects: string[] }
+  > = new Map();
   employeeList: Employee[] = [];
 
   constructor(timeperiodService: TimePeriodService) {
@@ -44,6 +48,8 @@ export class ModelsBuilderService {
 
     console.log(this.projects);
     this.buildPairsPerProject();
+    this.aggregatePairsAccrossProjects();
+    console.log(this.findTopPair());
   }
 
   buildPairsPerProject(): void {
@@ -78,5 +84,55 @@ export class ModelsBuilderService {
       ([id, overlapPeriod]) => ({ id, overlapPeriod })
     );
     console.log(this.employeeProjectPeriods);
+  }
+
+  aggregatePairsAccrossProjects(): Map<
+    string,
+    {
+      empA: string;
+      empB: string;
+      totalTime: number;
+      projects: string[];
+    }
+  > {
+    for (const record of this.employeeProjectPeriods) {
+      const [empA, empB, projectId] = record.id.split(":");
+      const [first, second] = [empA, empB].sort(); // alphabetical order key to avoid duplications
+      const key = `${first}:${second}`;
+      if (!this.aggregatedPairs.has(key)) {
+        this.aggregatedPairs.set(key, {
+          empA,
+          empB,
+          totalTime: record.overlapPeriod.delta,
+          projects: [projectId],
+        });
+      } else {
+        const existing = this.aggregatedPairs.get(key);
+        if (existing) {
+          existing.totalTime += record.overlapPeriod.delta;
+          existing.projects.push(projectId);
+        }
+      }
+    }
+
+    console.log(this.aggregatedPairs);
+    return this.aggregatedPairs;
+  }
+
+  findTopPair(): {
+    empA: string;
+    empB: string;
+    totalTime: number;
+    projects: string[];
+  } | null {
+    let topPair = null;
+    let maxTime = 0;
+    for (const pair of this.aggregatedPairs.values()) {
+      if (pair.totalTime > maxTime) {
+        maxTime = pair.totalTime;
+        topPair = pair;
+      }
+    }
+    return topPair;
   }
 }
