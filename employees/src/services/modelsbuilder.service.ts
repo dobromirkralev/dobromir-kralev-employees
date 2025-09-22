@@ -52,10 +52,8 @@ export class ModelsBuilderService {
       }
     });
 
-    // console.log(this.projects);
     this.buildPairsPerProject();
     this.aggregatePairsAccrossProjects();
-    // console.log(this.findTopPair());
   }
 
   buildPairsPerProject(): void {
@@ -89,7 +87,6 @@ export class ModelsBuilderService {
       employeeProjectPeriods,
       ([id, overlapPeriod]) => ({ id, overlapPeriod })
     );
-    // console.log(this.employeeProjectPeriods);
   }
 
   aggregatePairsAccrossProjects(): Map<
@@ -121,7 +118,6 @@ export class ModelsBuilderService {
       }
     }
 
-    // console.log(this.aggregatedPairs);
     return this.aggregatedPairs;
   }
 
