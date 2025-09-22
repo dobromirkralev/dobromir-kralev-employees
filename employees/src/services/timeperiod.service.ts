@@ -1,5 +1,6 @@
 import type { TimePeriod, TimePeriodDelta } from "../models/timeperiod";
 import type { ITimePeriodService } from "./types/timeperiod";
+import { DateTime } from "luxon";
 
 export class TimePeriodService implements ITimePeriodService {
   createTimePeriod(startDate: Date, endDate: Date): TimePeriod {
@@ -15,8 +16,13 @@ export class TimePeriodService implements ITimePeriodService {
     period2: TimePeriod
   ): TimePeriodDelta {
     const latestStart =
-      perdiod1.start > period2.start ? perdiod1.start : period2.start;
-    const earliestEnd = perdiod1.end < period2.end ? perdiod1.end : period2.end;
+      DateTime.fromJSDate(perdiod1.start) > DateTime.fromJSDate(period2.start)
+        ? perdiod1.start
+        : period2.start;
+    const earliestEnd =
+      DateTime.fromJSDate(perdiod1.end) < DateTime.fromJSDate(period2.end)
+        ? perdiod1.end
+        : period2.end;
     if (latestStart > earliestEnd) {
       return {
         startTime: latestStart,
@@ -48,8 +54,12 @@ export class TimePeriodService implements ITimePeriodService {
     start2: Date,
     end2: Date
   ): number {
-    const latestStart = start1 > start2 ? start1 : start2;
-    const earliestEnd = end1 < end2 ? end1 : end2;
+    const latestStart =
+      DateTime.fromJSDate(start1) > DateTime.fromJSDate(start2)
+        ? start1
+        : start2;
+    const earliestEnd =
+      DateTime.fromJSDate(end1) < DateTime.fromJSDate(end2) ? end1 : end2;
     if (latestStart > earliestEnd) {
       return 0; // No overlap
     }
@@ -76,58 +86,41 @@ export class TimePeriodService implements ITimePeriodService {
 
     dateStr = dateStr.trim();
 
-    if (
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?$/.test(
-        dateStr
-      )
-    ) {
-      //YYYY-MM-DDTHH:mm:ssZ
-      return new Date(dateStr);
+    let dt = DateTime.fromISO(dateStr, { zone: "utc" });
+    if (dt.isValid) {
+      return dt.toJSDate();
     }
 
-    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/.test(dateStr)) {
-      //YYYY-MM-DD HH:mm:ss
-      return new Date(dateStr.replace(" ", "T"));
+    dt = DateTime.fromFormat(dateStr, "yyyy-MM-dd HH:mm:ss 'UTC'", {
+      zone: "utc",
+    });
+    if (dt.isValid) {
+      return dt.toJSDate();
     }
 
-    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})? UTC$/.test(dateStr)) {
-      //YYYY-MM-DD HH:mm:ss UTC
-      return new Date(dateStr.replace(" UTC", "Z").replace(" ", "T"));
+    dt = DateTime.fromFormat(dateStr, "dd-MM-yyyy", { zone: "utc" });
+    if (dt.isValid) {
+      return dt.toJSDate();
     }
 
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-      // YYYY-MM-DD
-      const [y, m, d] = dateStr.split("-").map(Number);
-      return new Date(y, m - 1, d);
+    dt = DateTime.fromFormat(dateStr, "MM/dd/yyyy", { zone: "utc" });
+    if (dt.isValid) {
+      return dt.toJSDate();
     }
 
-    if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
-      // DD-MM-YYYY
-      const [d, m, y] = dateStr.split("-").map(Number);
-      return new Date(y, m - 1, d);
+    dt = DateTime.fromFormat(dateStr, "dd/MM/yyyy", { zone: "utc" });
+    if (dt.isValid) {
+      return dt.toJSDate();
     }
 
-    if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) {
-      // YYYY/MM/DD
-      const [y, m, d] = dateStr.split("/").map(Number);
-      return new Date(y, m - 1, d);
+    dt = DateTime.fromFormat(dateStr, "MMMM dd, yyyy", { zone: "utc" });
+    if (dt.isValid) {
+      return dt.toJSDate();
     }
 
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-      // MM/DD/YYYY
-      const [m, d, y] = dateStr.split("/").map(Number);
-      return new Date(y, m - 1, d);
-    }
-
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
-      // DD/MM/YYYY
-      const [d, m, y] = dateStr.split("/").map(Number);
-      return new Date(y, m - 1, d);
-    }
-
-    if (/^[A-Za-z]+ \d{1,2}, \d{4}$/.test(dateStr)) {
-      // Month DD, YYYY
-      return new Date(dateStr);
+    dt = DateTime.fromFormat(dateStr, "MMM dd, yyyy", { zone: "utc" });
+    if (dt.isValid) {
+      return dt.toJSDate();
     }
 
     if (dateStr === "NULL") {
